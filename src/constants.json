@@ -1,0 +1,22 @@
+{
+  "HOME_PAGE": {
+    "TITLE": "WireLess",
+    "DESCRIPTION": "Your intelligent self-configuring circuit prototyping system. Choose your path to innovation.",
+    "CARDS": [
+      {
+        "EMOJI": "🚀",
+        "TITLE": "Smart Start Mode",
+        "DESCRIPTION": "A guided, step-by-step wizard perfect for beginners or quick prototyping. Let WireLess intelligently configure your circuit.",
+        "BUTTON_TEXT": "Start Smart",
+        "DISABLED": false
+      },
+      {
+        "EMOJI": "💻",
+        "TITLE": "Pro Mode",
+        "DESCRIPTION": "Full control and advanced features for experienced users. Design, simulate, and optimize with precision.",
+        "BUTTON_TEXT": "Enter Pro Mode",
+        "DISABLED": true
+      }
+    ]
+  }
+}
