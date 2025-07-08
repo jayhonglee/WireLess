@@ -1,4 +1,11 @@
 {
+  "NAVBAR_ENUM": {
+    "HOME": "Home",
+    "SMART_START_MODE": "Smart Start Mode",
+    "PRO_MODE": "Pro Mode",
+    "ABOUT": "About",
+    "GUIDE": "Guide"
+  },
   "HOME_PAGE": {
     "TITLE": "WireLess",
     "DESCRIPTION": "Your intelligent self-configuring circuit prototyping system. Choose your path to innovation.",

@@ -1,5 +1,5 @@
 import { Head } from "components/Head";
-import { HOME_PAGE } from "constants.json";
+import { NAVBAR_ENUM, HOME_PAGE } from "constants.json";
 import Navbar from "components/Navbar";
 import DefaultHeading from "components/DefaultHeading";
 import Card from "components/Card";
@@ -9,7 +9,10 @@ export function Home() {
     <div className="flex flex-col min-h-screen">
       <Head title="WireLess" />
 
-      <Navbar />
+      <Navbar
+        items={Object.values(NAVBAR_ENUM)}
+        selectedMode={NAVBAR_ENUM.HOME}
+      />
 
       <div className="flex flex-col items-center justify-center flex-1">
         <DefaultHeading
