@@ -21,8 +21,32 @@
         "EMOJI": "💻",
         "TITLE": "Pro Mode",
         "DESCRIPTION": "Full control and advanced features for experienced users. Design, simulate, and optimize with precision.",
-        "BUTTON_TEXT": "Enter Pro Mode",
+        "BUTTON_TEXT": "COMING SOON",
         "DISABLED": true
+      }
+    ]
+  },
+  "SMART_START_MODE_PAGE": {
+    "STEPS": [
+      {
+        "TITLE": "Power Source Selection",
+        "DESCRIPTION": "Define power source parameters",
+        "ICON": "POWER_SOURCE"
+      },
+      {
+        "TITLE": "Component Selection",
+        "DESCRIPTION": "Add components to your circuit",
+        "ICON": "COMPONENT"
+      },
+      {
+        "TITLE": "Review Circuit Summary",
+        "DESCRIPTION": "Review your circuit summary",
+        "ICON": "REVIEW"
+      },
+      {
+        "TITLE": "Generate Circuit",
+        "DESCRIPTION": "Automatically generate a circuit",
+        "ICON": "GENERATE"
       }
     ]
   }
