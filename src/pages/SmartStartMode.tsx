@@ -13,8 +13,13 @@ export function SmartStartMode() {
         selectedMode={NAVBAR_ENUM.SMART_START_MODE}
       />
 
-      <div className="flex-1 flex flex-col items-center bg-white">
-        <Stepper steps={SMART_START_MODE_PAGE.STEPS} currentStep={0} />
+      <div className="flex-1 grid grid-cols-2 gap-4 bg-white">
+        <div className="col-span-1 flex justify-center items-center">
+          <Stepper steps={SMART_START_MODE_PAGE.STEPS} currentStep={0} />
+        </div>
+        <div className="col-span-1 flex justify-center items-center">
+          {/* Somethign here */}
+        </div>
       </div>
     </div>
   );
