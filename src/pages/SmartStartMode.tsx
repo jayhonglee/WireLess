@@ -1,9 +1,7 @@
 import { Head } from "components/Head";
-import { NAVBAR_ENUM, SMART_START_MODE_PAGE } from "constants.json";
+import { ROUTE_NAMES } from "utils/routes";
 import Navbar from "components/Navbar";
-import Stepper from "components/Stepper";
 import SmartStartModeComponent from "components/temp/SmartStartMode";
-import getStepContent from "components/SmartStartModeSteps/getStepContent";
 
 export function SmartStartMode() {
   return (
@@ -11,8 +9,8 @@ export function SmartStartMode() {
       <Head title="WireLess" />
 
       <Navbar
-        items={Object.values(NAVBAR_ENUM)}
-        selectedMode={NAVBAR_ENUM.SMART_START_MODE}
+        items={Object.values(ROUTE_NAMES)}
+        selectedMode={ROUTE_NAMES.SMART_START_MODE}
       />
 
       {/* <div className="flex-1 grid grid-cols-20 gap-15 bg-white">

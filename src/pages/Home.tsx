@@ -1,5 +1,6 @@
 import { Head } from "components/Head";
-import { NAVBAR_ENUM, HOME_PAGE } from "constants.json";
+import { ROUTE_NAMES, ROUTES } from "utils/routes";
+import { HOME_PAGE } from "constants.json";
 import Navbar from "components/Navbar";
 import DefaultHeading from "components/DefaultHeading";
 import Card from "components/Card";
@@ -10,8 +11,8 @@ export function Home() {
       <Head title="WireLess" />
 
       <Navbar
-        items={Object.values(NAVBAR_ENUM)}
-        selectedMode={NAVBAR_ENUM.HOME}
+        items={Object.values(ROUTE_NAMES)}
+        selectedMode={ROUTE_NAMES.HOME}
       />
 
       <div className="flex-1 bg-white bg-[url('https://flowbite.s3.amazonaws.com/docs/jumbotron/hero-pattern.svg')] relative">

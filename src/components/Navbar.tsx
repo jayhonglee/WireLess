@@ -1,9 +1,15 @@
+import { getRoutePath, getDisplayName } from "../utils/routes";
+import { useLocation } from "react-router";
+
 interface NavbarProps {
   items: string[];
   selectedMode: string;
 }
 
 export default function Navbar({ items, selectedMode }: NavbarProps) {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   return (
     <nav className="border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -43,21 +49,26 @@ export default function Navbar({ items, selectedMode }: NavbarProps) {
         </button>
         <div className="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
           <ul className="flex flex-col font-medium mt-4 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700">
-            {items.map((item) => (
-              <li>
-                <a
-                  href={`/${item.toLowerCase()}`}
-                  className={`block py-2 px-3 md:p-0  rounded-sm md:bg-transparent ${
-                    selectedMode === item
-                      ? "md:text-blue-700 text-white bg-blue-700"
-                      : "text-gray-900"
-                  }`}
-                  aria-current={selectedMode === item ? "page" : undefined}
-                >
-                  {item}
-                </a>
-              </li>
-            ))}
+            {items.map((item) => {
+              const routePath = getRoutePath(item);
+              const isActive = currentPath === routePath;
+
+              return (
+                <li key={item}>
+                  <a
+                    href={routePath}
+                    className={`block py-2 px-3 md:p-0 rounded-sm md:bg-transparent ${
+                      isActive
+                        ? "md:text-blue-700 text-white bg-blue-700"
+                        : "text-gray-900"
+                    }`}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    {item}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
