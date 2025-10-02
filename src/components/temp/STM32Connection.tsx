@@ -34,6 +34,7 @@ export default function STM32Connection({
   const [isGenerating, setIsGenerating] = useState(false);
   const [receivedData, setReceivedData] = useState<STM32Response[]>([]);
   const [connectionStatus, setConnectionStatus] = useState("Disconnected");
+  const [currentPort, setCurrentPort] = useState<string>("");
   const [generationStatus, setGenerationStatus] = useState<
     "idle" | "connecting" | "generating" | "success" | "error"
   >("idle");
@@ -82,6 +83,7 @@ export default function STM32Connection({
       setUart(stm32Connection);
       setIsConnected(true);
       setConnectionStatus("Connected to STM32F446RE");
+      setCurrentPort("Port selected via browser dialog");
       setGenerationStatus("idle");
     } else {
       setConnectionStatus("Connection failed");
@@ -270,6 +272,18 @@ export default function STM32Connection({
             </span>
           </div>
         </div>
+
+        {isConnected && currentPort && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="text-sm text-blue-700 dark:text-blue-300">
+              <strong>Port:</strong> {currentPort}
+            </div>
+            <div className="text-sm text-blue-600 dark:text-blue-400">
+              <strong>Baud Rate:</strong> 115200 | <strong>Data Bits:</strong> 8
+              | <strong>Stop Bits:</strong> 1
+            </div>
+          </div>
+        )}
 
         <div className="flex space-x-4">
           {!isConnected ? (

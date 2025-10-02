@@ -26,7 +26,7 @@ export function Home() {
 
           <div className="h-10" />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full px-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-lg w-full px-4">
             {HOME_PAGE.CARDS.map((card) => (
               <Card
                 key={card.TITLE}

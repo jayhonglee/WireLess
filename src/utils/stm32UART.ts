@@ -65,6 +65,15 @@ export class STM32UARTConnection {
     this.config = config;
   }
 
+  async getAvailablePorts(): Promise<SerialPort[]> {
+    try {
+      return await navigator.serial.getPorts();
+    } catch (error) {
+      console.error('Error getting available ports:', error);
+      return [];
+    }
+  }
+
   async connect(): Promise<boolean> {
     try {
       // Request port access - this will show a port selection dialog
@@ -225,5 +234,9 @@ export class STM32UARTConnection {
 
   getConfig(): STM32Config {
     return { ...this.config };
+  }
+
+  getCurrentPort(): SerialPort | null {
+    return this.port;
   }
 }

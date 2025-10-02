@@ -10,7 +10,7 @@ export const ROUTES = {
 export const ROUTE_NAMES = {
   HOME: 'Home',
   SMART_START_MODE: 'Smart Start Mode',
-  PRO_MODE: 'Pro Mode',
+  // PRO_MODE: 'Pro Mode',
   ABOUT: 'About',
   GUIDE: 'Guide'
 } as const;
