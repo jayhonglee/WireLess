@@ -65,21 +65,11 @@ export class STM32UARTConnection {
     this.config = config;
   }
 
-  async getAvailablePorts(): Promise<SerialPort[]> {
-    try {
-      return await navigator.serial.getPorts();
-    } catch (error) {
-      console.error('Error getting available ports:', error);
-      return [];
-    }
-  }
 
   async connect(): Promise<boolean> {
     try {
-      // Request port access - this will show a port selection dialog
+      // Request port access - shows port selection dialog
       this.port = await navigator.serial.requestPort();
-      
-      // Open the port with STM32 configuration
       await this.port.open({
         baudRate: this.config.baudRate,
         dataBits: this.config.dataBits,
@@ -88,7 +78,6 @@ export class STM32UARTConnection {
         bufferSize: 1024,
         flowControl: this.config.flowControl
       });
-
       this.isConnected = true;
       this.startReading();
       console.log('STM32F446RE connected successfully');
@@ -120,7 +109,7 @@ export class STM32UARTConnection {
 
     try {
       const textDecoder = new TextDecoderStream();
-      const readableStreamClosed = this.port.readable?.pipeTo(textDecoder.writable);
+      this.port.readable?.pipeTo(textDecoder.writable);
       this.reader = textDecoder.readable?.getReader();
 
       if (!this.reader) return;
@@ -145,7 +134,6 @@ export class STM32UARTConnection {
 
   private handleIncomingData(data: string): void {
     try {
-      // Parse STM32 response
       const lines = data.split('\n').filter(line => line.trim());
       
       for (const line of lines) {
@@ -153,7 +141,6 @@ export class STM32UARTConnection {
           const response: STM32Response = JSON.parse(line);
           this.onDataCallback?.(response);
         } catch {
-          // If not JSON, treat as plain text response
           const response: STM32Response = {
             status: 'data',
             data: line.trim(),
@@ -172,25 +159,31 @@ export class STM32UARTConnection {
       console.error('STM32F446RE not connected');
       return false;
     }
-
     try {
       const textEncoder = new TextEncoderStream();
-      const writableStreamClosed = textEncoder.readable?.pipeTo(this.port.writable!);
+      textEncoder.readable?.pipeTo(this.port.writable!);
       this.writer = textEncoder.writable?.getWriter();
-
       if (!this.writer) return false;
 
-      const commandData: STM32Command = {
-        command,
-        parameters,
-        timestamp: Date.now()
-      };
+      let message: string;
+      // For CIRCUIT_STRUCTURE, send the raw structure string
+      if (command === 'CIRCUIT_STRUCTURE' && parameters?.structure) {
+        message = parameters.structure + '\n';
+        console.log('Sending raw structure to STM32F446RE:', message);
+      } else {
+        // For other commands, send as JSON
+        const commandData: STM32Command = {
+          command,
+          parameters,
+          timestamp: Date.now()
+        };
+        message = JSON.stringify(commandData) + '\n';
+        console.log('Sending JSON to STM32F446RE:', message);
+      }
 
-      const message = JSON.stringify(commandData) + '\n';
-      await this.writer.write(message);
+      await this.writer.write(`${message}X`);
       await this.writer.close();
-      
-      console.log('Sent to STM32F446RE:', commandData);
+      console.log('Sent to STM32F446RE:', message);
       return true;
     } catch (error) {
       console.error('Error sending command to STM32F446RE:', error);
@@ -221,7 +214,27 @@ export class STM32UARTConnection {
   }
 
   async sendCircuitStructure(structure: string): Promise<boolean> {
-    return this.sendCommand('CIRCUIT_STRUCTURE', { structure });
+    if (!this.isConnected || !this.port) {
+      console.error('STM32F446RE not connected');
+      return false;
+    }
+    try {
+      const textEncoder = new TextEncoderStream();
+      textEncoder.readable?.pipeTo(this.port.writable!);
+      this.writer = textEncoder.writable?.getWriter();
+      if (!this.writer) return false;
+      const message = structure.padEnd(14, "!");
+      console.log('Sending raw circuit structure to STM32F446RE:', message);
+      // await this.writer.write(message);
+      await this.writer.write(message);
+      await this.writer.close();
+      console.log('Sent to STM32F446RE:', message);
+      return true;
+    } catch (error) {
+      console.error('Error sending circuit structure to STM32F446RE:', error);
+      this.onErrorCallback?.(`Send failed: ${error}`);
+      return false;
+    }
   }
 
   onData(callback: (data: STM32Response) => void): void {
@@ -240,7 +253,4 @@ export class STM32UARTConnection {
     return { ...this.config };
   }
 
-  getCurrentPort(): SerialPort | null {
-    return this.port;
-  }
 }
