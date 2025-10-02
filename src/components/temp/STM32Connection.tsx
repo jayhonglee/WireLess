@@ -141,7 +141,7 @@ export default function STM32Connection({
 
     try {
       // Only send raw circuit structure
-      await uart.sendCircuitStructure("RRRRRRRR"); // Reset signal
+      await uart.sendCircuitStructure("rnnnnnnn"); // Reset signal
       if (handleResetCircuit) {
         await handleResetCircuit();
       }
