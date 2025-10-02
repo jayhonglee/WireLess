@@ -40,6 +40,7 @@ interface CircuitData {
     image: string;
   } | null;
   components: Array<{
+    mode: string;
     id: string;
     type: string;
     value: string;
@@ -214,6 +215,7 @@ function ComponentSelection({
 }) {
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedValue, setSelectedValue] = useState<string>("");
+  const [addMode, setAddMode] = useState<"series" | "parallel">("series");
 
   const COMPONENT_OPTIONS = [
     {
@@ -240,7 +242,7 @@ function ComponentSelection({
   ];
 
   const handleAddComponent = () => {
-    if (selectedType && selectedValue) {
+    if (selectedType) {
       const newComponent = {
         id: `${selectedType}-${Date.now()}`,
         type: selectedType,
@@ -248,20 +250,17 @@ function ComponentSelection({
         image:
           COMPONENT_OPTIONS.find((opt) => opt.type === selectedType)?.image ||
           "",
+        mode: addMode, // Track how it was added
       };
       onUpdate([...components, newComponent]);
       setSelectedType("");
       setSelectedValue("");
+      setAddMode("series");
     }
   };
 
   const handleRemoveComponent = (id: string) => {
     onUpdate(components.filter((comp) => comp.id !== id));
-  };
-
-  const getAvailableValues = () => {
-    const option = COMPONENT_OPTIONS.find((opt) => opt.type === selectedType);
-    return option ? option.values : [];
   };
 
   return (
@@ -304,29 +303,32 @@ function ComponentSelection({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Value/Specification
+              Add Mode
             </label>
             <select
-              value={selectedValue}
-              onChange={(e) => setSelectedValue(e.target.value)}
-              disabled={!selectedType}
+              value={addMode}
+              onChange={(e) =>
+                setAddMode(e.target.value as "series" | "parallel")
+              }
+              disabled={components.length === 0} // Disable for first component
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50"
             >
-              <option value="">Select value...</option>
-              {getAvailableValues().map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
+              <option value="series">Series</option>
+              <option value="parallel">Parallel</option>
             </select>
+            {components.length === 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                First component must be in series.
+              </p>
+            )}
           </div>
 
           <div className="flex items-end">
             <button
               onClick={handleAddComponent}
-              disabled={!selectedType || !selectedValue}
+              disabled={!selectedType}
               className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
-                selectedType && selectedValue
+                selectedType
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
@@ -378,6 +380,13 @@ function ComponentSelection({
                       />
                     </svg>
                   </button>
+                </div>
+                <div className="absolute top-2 right-2">
+                  {component.mode === "parallel" && (
+                    <span className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1">
+                      Parallel
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
@@ -629,12 +638,37 @@ function ReviewCircuit({
   );
 }
 
+// --- Add this helper function ---
+function getCircuitStructure(components: CircuitData["components"]) {
+  if (components.length === 0) return "";
+  let structure = "";
+  let i = 0;
+  while (i < components.length) {
+    const comp = components[i];
+    if (!comp) break;
+    const mode = comp.mode;
+    let count = 1;
+    // Count consecutive components with the same mode
+    while (
+      i + count < components.length &&
+      components[i + count] &&
+      components[i + count]!.mode === mode
+    ) {
+      count++;
+    }
+    structure += (mode === "series" ? "S" : "P") + count;
+    i += count;
+  }
+  return structure;
+}
+
 export default function SmartStartMode() {
   const [currentStep, setCurrentStep] = useState(0);
   const [circuitData, setCircuitData] = useState<CircuitData>({
     powerSource: null,
     components: [],
   });
+  const [circuitStructure, setCircuitStructure] = useState<string>("");
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -648,8 +682,10 @@ export default function SmartStartMode() {
     }
   };
 
+  // Update components and circuit structure
   const updateComponents = (components: CircuitData["components"]) => {
     setCircuitData((prev) => ({ ...prev, components }));
+    setCircuitStructure(getCircuitStructure(components));
   };
 
   const renderCurrentStep = () => {
@@ -677,6 +713,7 @@ export default function SmartStartMode() {
         return (
           <STM32Connection
             circuitData={circuitData}
+            circuitStructure={circuitStructure}
             onCircuitGenerated={(success, message) => {
               console.log("Circuit generation result:", success, message);
             }}
@@ -691,13 +728,21 @@ export default function SmartStartMode() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Smart Start Mode
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Follow the steps below to create your circuit
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Smart Start Mode
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Follow the steps below to create your circuit
+            </p>
+            {/* Show circuit structure */}
+            {circuitStructure && (
+              <div className="mt-2 text-blue-700 dark:text-blue-300 font-mono">
+                Circuit Structure: {circuitStructure}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -15,26 +15,30 @@ interface CircuitData {
     type: string;
     value: string;
     image: string;
+    mode: string;
   }>;
 }
 
 interface STM32ConnectionProps {
   circuitData?: CircuitData;
+  circuitStructure?: string;
   onCircuitGenerated?: (success: boolean, message: string) => void;
   onPrevious?: () => void;
+  handleResetCircuit?: () => void;
 }
 
 export default function STM32Connection({
   circuitData,
+  circuitStructure,
   onCircuitGenerated,
   onPrevious,
+  handleResetCircuit,
 }: STM32ConnectionProps) {
   const [uart, setUart] = useState<STM32UARTConnection | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [receivedData, setReceivedData] = useState<STM32Response[]>([]);
   const [connectionStatus, setConnectionStatus] = useState("Disconnected");
-  const [currentPort, setCurrentPort] = useState<string>("");
   const [generationStatus, setGenerationStatus] = useState<
     "idle" | "connecting" | "generating" | "success" | "error"
   >("idle");
@@ -42,6 +46,7 @@ export default function STM32Connection({
   useEffect(() => {
     if (uart) {
       uart.onData((data: STM32Response) => {
+        console.log("Received from STM32:", data);
         setReceivedData((prev) => [...prev, data]);
 
         // Handle different response types
@@ -83,7 +88,6 @@ export default function STM32Connection({
       setUart(stm32Connection);
       setIsConnected(true);
       setConnectionStatus("Connected to STM32F446RE");
-      setCurrentPort("Port selected via browser dialog");
       setGenerationStatus("idle");
     } else {
       setConnectionStatus("Connection failed");
@@ -103,8 +107,8 @@ export default function STM32Connection({
   };
 
   const generateCircuit = async () => {
-    if (!uart || !isConnected || !circuitData) {
-      console.error("Cannot generate circuit: not connected or no data");
+    if (!uart || !isConnected || !circuitStructure) {
+      console.error("Cannot generate circuit: not connected or no structure");
       return;
     }
 
@@ -113,23 +117,41 @@ export default function STM32Connection({
     setReceivedData([]);
 
     try {
-      // Send power source configuration
-      if (circuitData.powerSource) {
-        await uart.setPowerSource(circuitData.powerSource);
-      }
+      // Only send raw circuit structure
+      await uart.sendCircuitStructure(circuitStructure);
 
-      // Send circuit data
-      await uart.sendCircuitData(circuitData);
-
-      // Generate the circuit
-      await uart.generateCircuit(circuitData.components);
-
-      console.log("Circuit generation commands sent to STM32F446RE");
+      console.log("Raw circuit structure sent to STM32F446RE");
     } catch (error) {
-      console.error("Error generating circuit:", error);
+      console.error("Error sending circuit structure:", error);
       setGenerationStatus("error");
       setIsGenerating(false);
-      onCircuitGenerated?.(false, "Failed to send circuit data");
+      onCircuitGenerated?.(false, "Failed to send circuit structure");
+    }
+  };
+
+  const resetChip = async () => {
+    if (!uart || !isConnected || !circuitStructure) {
+      console.error("Cannot generate circuit: not connected or no structure");
+      return;
+    }
+
+    setIsGenerating(true);
+    setGenerationStatus("connecting");
+    setReceivedData([]);
+
+    try {
+      // Only send raw circuit structure
+      await uart.sendCircuitStructure("RRRRRRRRRRRRRRRRR"); // Reset signal
+      if (handleResetCircuit) {
+        await handleResetCircuit();
+      }
+
+      console.log("Reset signal sent to STM32F446RE");
+    } catch (error) {
+      console.error("Error sending circuit structure:", error);
+      setGenerationStatus("error");
+      setIsGenerating(false);
+      onCircuitGenerated?.(false, "Failed to send circuit structure");
     }
   };
 
@@ -273,18 +295,6 @@ export default function STM32Connection({
           </div>
         </div>
 
-        {isConnected && currentPort && (
-          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <div className="text-sm text-blue-700 dark:text-blue-300">
-              <strong>Port:</strong> {currentPort}
-            </div>
-            <div className="text-sm text-blue-600 dark:text-blue-400">
-              <strong>Baud Rate:</strong> 115200 | <strong>Data Bits:</strong> 8
-              | <strong>Stop Bits:</strong> 1
-            </div>
-          </div>
-        )}
-
         <div className="flex space-x-4">
           {!isConnected ? (
             <button
@@ -324,21 +334,30 @@ export default function STM32Connection({
         </div>
 
         {isConnected && circuitData && (
-          <button
-            onClick={generateCircuit}
-            disabled={isGenerating || generationStatus === "success"}
-            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-              isGenerating || generationStatus === "success"
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700"
-            }`}
-          >
-            {isGenerating
-              ? "Generating..."
-              : generationStatus === "success"
-                ? "Circuit Generated!"
-                : "Generate Circuit"}
-          </button>
+          <>
+            <button
+              onClick={generateCircuit}
+              disabled={isGenerating || generationStatus === "success"}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                isGenerating || generationStatus === "success"
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+            >
+              {isGenerating
+                ? "Generating..."
+                : generationStatus === "success"
+                  ? "Circuit Generated!"
+                  : "Generate Circuit"}
+            </button>
+
+            <button
+              onClick={resetChip}
+              className={`ml-5 px-6 py-3 rounded-lg font-medium transition-colors bg-red-500 text-white-500`}
+            >
+              Reset Chip
+            </button>
+          </>
         )}
 
         {generationStatus === "success" && (
@@ -386,7 +405,7 @@ export default function STM32Connection({
       </div>
 
       {/* Communication Log */}
-      {isConnected && receivedData.length > 0 && (
+      {
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Communication Log
@@ -408,7 +427,7 @@ export default function STM32Connection({
                           : "text-blue-600"
                     }`}
                   >
-                    {data.status.toUpperCase()}
+                    {data.status}
                   </span>
                   <span className="ml-2 text-gray-700 dark:text-gray-300">
                     {JSON.stringify(data.data || data.message)}
@@ -418,7 +437,7 @@ export default function STM32Connection({
             </div>
           </div>
         </div>
-      )}
+      }
 
       {/* Navigation */}
       <div className="flex justify-between">

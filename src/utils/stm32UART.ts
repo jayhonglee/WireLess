@@ -220,6 +220,10 @@ export class STM32UARTConnection {
     return this.sendCommand('RESET_SYSTEM');
   }
 
+  async sendCircuitStructure(structure: string): Promise<boolean> {
+    return this.sendCommand('CIRCUIT_STRUCTURE', { structure });
+  }
+
   onData(callback: (data: STM32Response) => void): void {
     this.onDataCallback = callback;
   }
