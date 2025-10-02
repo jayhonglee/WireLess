@@ -223,7 +223,8 @@ export class STM32UARTConnection {
       textEncoder.readable?.pipeTo(this.port.writable!);
       this.writer = textEncoder.writable?.getWriter();
       if (!this.writer) return false;
-      const message = structure.padEnd(14, "!");
+      // const message = structure.padEnd(14, "!");
+      const message = structure.padEnd(8, "n");
       console.log('Sending raw circuit structure to STM32F446RE:', message);
       // await this.writer.write(message);
       await this.writer.write(message);
