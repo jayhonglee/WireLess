@@ -222,21 +222,21 @@ function ComponentSelection({
       type: "Resistor",
       values: ["100Ω", "220Ω", "470Ω", "1kΩ", "10kΩ", "100kΩ"],
       image:
-        "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=200&h=200&fit=crop&crop=center",
+        "https://projectpoint.in/image/cache/catalog/CFR-1W-3M3-672x504.jpg",
       description: "Resistive components for current limiting",
     },
     {
       type: "LED",
       values: ["Red", "Green", "Blue", "White", "Yellow"],
       image:
-        "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200&h=200&fit=crop&crop=center",
+        "https://cdn11.bigcommerce.com/s-am5zt8xfow/images/stencil/300x300/products/1158/2882/apipocsrl__91685.1554989476.jpg?c=2",
       description: "Light emitting diodes for indicators",
     },
     {
       type: "Capacitor",
       values: ["1µF", "10µF", "100µF", "1mF", "10mF"],
       image:
-        "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=200&h=200&fit=crop&crop=center",
+        "https://components101.com/sites/default/files/components/Electrolytic-capacitor.jpg",
       description: "Capacitive components for filtering",
     },
   ];

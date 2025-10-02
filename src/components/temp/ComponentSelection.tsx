@@ -19,42 +19,42 @@ const COMPONENT_OPTIONS = [
     type: "Resistor",
     values: ["100Ω", "220Ω", "470Ω", "1kΩ", "10kΩ", "100kΩ"],
     image:
-      "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=200&h=200&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center",
     description: "Resistive components for current limiting",
   },
   {
     type: "LED",
     values: ["Red", "Green", "Blue", "White", "Yellow"],
     image:
-      "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200&h=200&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=200&h=200&fit=crop&crop=center",
     description: "Light emitting diodes for indicators",
   },
   {
     type: "Capacitor",
     values: ["1µF", "10µF", "100µF", "1mF", "10mF"],
     image:
-      "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=200&h=200&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=200&h=200&fit=crop&crop=center",
     description: "Capacitive components for filtering",
   },
   {
     type: "Switch",
     values: ["Toggle", "Push Button", "Slide", "Rotary"],
     image:
-      "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=200&h=200&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1592394661941-dddf9c7d1c7b?w=200&h=200&fit=crop&crop=center",
     description: "Switching components for control",
   },
   {
     type: "Transistor",
     values: ["NPN", "PNP", "MOSFET", "JFET"],
     image:
-      "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=200&h=200&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop&crop=center",
     description: "Amplification and switching devices",
   },
   {
     type: "IC",
     values: ["555 Timer", "Op-Amp", "Logic Gate", "Microcontroller"],
     image:
-      "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200&h=200&fit=crop&crop=center",
+      "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=200&h=200&fit=crop&crop=center",
     description: "Integrated circuits for complex functions",
   },
 ];
