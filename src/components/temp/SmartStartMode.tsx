@@ -301,7 +301,7 @@ function ComponentSelection({
             </select>
           </div>
 
-          <div>
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Add Mode
             </label>
@@ -316,11 +316,11 @@ function ComponentSelection({
               <option value="series">Series</option>
               <option value="parallel">Parallel</option>
             </select>
-            {components.length === 0 && (
-              <p className="text-xs text-gray-500 mt-1">
+            {/* {components.length === 0 && (
+              <p className="absolute bottom-[-20px] left-[10px] text-xs text-gray-500 mt-1">
                 First component must be in series.
               </p>
-            )}
+            )} */}
           </div>
 
           <div className="flex items-end">
