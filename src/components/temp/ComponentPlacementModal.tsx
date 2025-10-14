@@ -96,7 +96,7 @@ export default function ComponentPlacementModal({
       <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
           <h4 className="font-semibold text-gray-900 dark:text-white">
-            8-Pin IC #{icNumber}
+            8-Pin IC Socket #{icNumber}
           </h4>
           <div className="flex items-center space-x-2">
             <span
@@ -151,7 +151,7 @@ export default function ComponentPlacementModal({
             })}
           </div>
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-            Pins 1-2 | Pins 3-4 | Pins 5-6 | Pins 7-8
+            Pins 1-8 | Pins 2-7 | Pins 3-6 | Pins 4-5
           </div>
         </div>
 
@@ -223,6 +223,27 @@ export default function ComponentPlacementModal({
 
         {/* Content */}
         <div className="p-6">
+          {/* 8-Pin IC Socket Reference */}
+          <div className="mb-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-center">
+              What is an 8-Pin IC Socket?
+            </h3>
+            <div className="flex justify-center mb-3">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-gray-300 dark:border-gray-600">
+                <img
+                  src="/ic_socket.png"
+                  alt="8-Pin IC Socket"
+                  className="w-auto h-32 object-contain rounded-lg"
+                />
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
+              An 8-pin IC socket is a connector that holds integrated circuits.
+              Each socket has 8 pins (4 on each side) and can accommodate up to
+              4 electronic components, with each component using 2 pins.
+            </p>
+          </div>
+
           {/* Legend */}
           <div className="mb-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
