@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { STM32UARTConnection } from "../../utils/stm32UART";
 import type { STM32Response } from "../../utils/stm32UART";
+import ComponentPlacementModal from "./ComponentPlacementModal";
 
 interface CircuitData {
   powerSource: {
@@ -42,6 +43,7 @@ export default function STM32Connection({
   const [generationStatus, setGenerationStatus] = useState<
     "idle" | "connecting" | "generating" | "success" | "error"
   >("idle");
+  const [isPlacementModalOpen, setIsPlacementModalOpen] = useState(false);
 
   useEffect(() => {
     if (uart) {
@@ -233,7 +235,7 @@ export default function STM32Connection({
           <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">
             Circuit to Generate
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {circuitData.powerSource && (
               <div className="flex items-center space-x-3">
                 <img
@@ -252,8 +254,11 @@ export default function STM32Connection({
                 </div>
               </div>
             )}
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center">
+            <div
+              onClick={() => setIsPlacementModalOpen(true)}
+              className="flex items-center space-x-3 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-800/50 rounded-lg p-2 transition-colors group"
+            >
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-700 transition-colors">
                 <svg
                   className="w-6 h-6 text-blue-600 dark:text-blue-400"
                   fill="currentColor"
@@ -266,13 +271,37 @@ export default function STM32Connection({
                   />
                 </svg>
               </div>
-              <div>
-                <div className="font-medium text-blue-900 dark:text-blue-100">
+              <div className="flex-1">
+                <div className="font-medium text-blue-900 dark:text-blue-100 group-hover:text-blue-800 dark:group-hover:text-blue-200">
                   {circuitData.components.length} Components
                 </div>
-                <div className="text-sm text-blue-700 dark:text-blue-300">
+                <div className="text-sm text-blue-700 dark:text-blue-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                   {circuitData.components.map((c) => c.type).join(", ")}
                 </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                  Click to see placement
+                </span>
+                <svg
+                  className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
               </div>
             </div>
           </div>
@@ -457,6 +486,14 @@ export default function STM32Connection({
           </button>
         )}
       </div>
+
+      {/* Component Placement Modal */}
+      <ComponentPlacementModal
+        isOpen={isPlacementModalOpen}
+        onClose={() => setIsPlacementModalOpen(false)}
+        circuitStructure={circuitStructure || ""}
+        components={circuitData?.components || []}
+      />
     </div>
   );
 }
