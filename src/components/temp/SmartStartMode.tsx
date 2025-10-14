@@ -2,6 +2,7 @@ import { useState } from "react";
 import { IconType, type IconTypeType } from "../../utils/getIcon";
 import STM32Connection from "./STM32Connection";
 import Stepper from "../Stepper";
+import ComponentInsertionModal from "./ComponentInsertionModal";
 
 interface Step {
   TITLE: string;
@@ -216,6 +217,11 @@ function ComponentSelection({
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedValue, setSelectedValue] = useState<string>("");
   const [addMode, setAddMode] = useState<"series" | "parallel">("series");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalComponent, setModalComponent] = useState<{
+    type: string;
+    image: string;
+  } | null>(null);
 
   const COMPONENT_OPTIONS = [
     {
@@ -263,6 +269,21 @@ function ComponentSelection({
     onUpdate(components.filter((comp) => comp.id !== id));
   };
 
+  const handleComponentClick = (componentType: string) => {
+    const component = COMPONENT_OPTIONS.find(
+      (opt) => opt.type === componentType
+    );
+    if (component) {
+      setModalComponent({ type: componentType, image: component.image });
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalComponent(null);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -279,6 +300,58 @@ function ComponentSelection({
         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
           Add New Component
         </h3>
+
+        {/* Clickable Component Types */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            Click on a component to see insertion instructions
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {COMPONENT_OPTIONS.map((option) => (
+              <div
+                key={option.type}
+                onClick={() => handleComponentClick(option.type)}
+                className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all duration-200 group"
+              >
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={option.image}
+                    alt={option.type}
+                    className="w-12 h-12 rounded-lg object-cover"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      {option.type}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {option.description}
+                    </p>
+                  </div>
+                  <svg
+                    className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -413,6 +486,16 @@ function ComponentSelection({
           Next Step
         </button>
       </div>
+
+      {/* Component Insertion Modal */}
+      {modalComponent && (
+        <ComponentInsertionModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          componentType={modalComponent.type}
+          componentImage={modalComponent.image}
+        />
+      )}
     </div>
   );
 }
