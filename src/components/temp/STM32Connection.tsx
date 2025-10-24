@@ -44,6 +44,12 @@ export default function STM32Connection({
     "idle" | "connecting" | "generating" | "success" | "error"
   >("idle");
   const [isPlacementModalOpen, setIsPlacementModalOpen] = useState(false);
+  const [isGifModalOpen, setIsGifModalOpen] = useState(false);
+  const [selectedGif, setSelectedGif] = useState<{
+    src: string;
+    title: string;
+    description: string;
+  } | null>(null);
 
   useEffect(() => {
     if (uart) {
@@ -321,11 +327,22 @@ export default function STM32Connection({
               <h4 className="text-md font-medium text-green-900 dark:text-green-100 mb-2">
                 Series Insertion
               </h4>
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+              <div
+                className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700 cursor-pointer hover:border-green-400 dark:hover:border-green-500 transition-colors group"
+                onClick={() => {
+                  setSelectedGif({
+                    src: "/series_insertion.gif",
+                    title: "Series Insertion",
+                    description:
+                      "Inserted to a new IC socket per series component",
+                  });
+                  setIsGifModalOpen(true);
+                }}
+              >
                 <img
                   src="/series_insertion.gif"
                   alt="Series component insertion demonstration"
-                  className="w-full h-48 object-contain rounded-lg"
+                  className="w-full h-48 object-contain rounded-lg group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
               <p className="text-xs text-green-600 dark:text-green-400 mt-2">
@@ -338,11 +355,22 @@ export default function STM32Connection({
               <h4 className="text-md font-medium text-green-900 dark:text-green-100 mb-2">
                 Parallel Insertion
               </h4>
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+              <div
+                className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700 cursor-pointer hover:border-green-400 dark:hover:border-green-500 transition-colors group"
+                onClick={() => {
+                  setSelectedGif({
+                    src: "/parallel_insertion.gif",
+                    title: "Parallel Insertion",
+                    description:
+                      "Inserted to the same IC socket per parallel component",
+                  });
+                  setIsGifModalOpen(true);
+                }}
+              >
                 <img
                   src="/parallel_insertion.gif"
                   alt="Parallel component insertion demonstration"
-                  className="w-full h-48 object-contain rounded-lg"
+                  className="w-full h-48 object-contain rounded-lg group-hover:scale-105 transition-transform duration-200"
                 />
               </div>
               <p className="text-xs text-green-600 dark:text-green-400 mt-2">
@@ -539,6 +567,49 @@ export default function STM32Connection({
         circuitStructure={circuitStructure || ""}
         components={circuitData?.components || []}
       />
+
+      {/* GIF Modal */}
+      {isGifModalOpen && selectedGif && (
+        <div className="fixed inset-0 bg-transparent bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {selectedGif.title}
+              </h3>
+              <button
+                onClick={() => setIsGifModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="text-center">
+                <img
+                  src={selectedGif.src}
+                  alt={`${selectedGif.title} demonstration`}
+                  className="w-full h-auto max-h-[60vh] object-contain rounded-lg"
+                />
+                <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                  {selectedGif.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
