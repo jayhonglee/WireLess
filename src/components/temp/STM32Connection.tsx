@@ -308,6 +308,51 @@ export default function STM32Connection({
         </div>
       )}
 
+      {/* Insertion Guide */}
+      {circuitData && circuitData.components.length > 0 && (
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-4">
+            Component Insertion Guide
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Series Insertion */}
+            <div className="text-center">
+              <h4 className="text-md font-medium text-green-900 dark:text-green-100 mb-2">
+                Series Insertion
+              </h4>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                <img
+                  src="/series_insertion.gif"
+                  alt="Series component insertion demonstration"
+                  className="w-full h-48 object-contain rounded-lg"
+                />
+              </div>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                Inserted to a new IC socket per series component
+              </p>
+            </div>
+
+            {/* Parallel Insertion */}
+            <div className="text-center">
+              <h4 className="text-md font-medium text-green-900 dark:text-green-100 mb-2">
+                Parallel Insertion
+              </h4>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                <img
+                  src="/parallel_insertion.gif"
+                  alt="Parallel component insertion demonstration"
+                  className="w-full h-48 object-contain rounded-lg"
+                />
+              </div>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                Inserted to the same IC socket per parallel component
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Connection Status */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
