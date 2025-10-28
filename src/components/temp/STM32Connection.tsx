@@ -138,8 +138,8 @@ export default function STM32Connection({
   };
 
   const resetChip = async () => {
-    if (!uart || !isConnected || !circuitStructure) {
-      console.error("Cannot generate circuit: not connected or no structure");
+    if (!uart || !isConnected) {
+      console.error("Cannot reset chip: not connected");
       return;
     }
 
@@ -148,18 +148,22 @@ export default function STM32Connection({
     setReceivedData([]);
 
     try {
-      // Only send raw circuit structure
+      // Send reset signal
       await uart.sendCircuitStructure("rnnnnnnn"); // Reset signal
-      if (handleResetCircuit) {
-        await handleResetCircuit();
-      }
-
       console.log("Reset signal sent to STM32F446RE");
+
+      // Mark as successful
+      setGenerationStatus("success");
+      setIsGenerating(false);
+
+      // Reset circuit data and navigate to component selection
+      if (handleResetCircuit) {
+        handleResetCircuit();
+      }
     } catch (error) {
-      console.error("Error sending circuit structure:", error);
+      console.error("Error sending reset signal:", error);
       setGenerationStatus("error");
       setIsGenerating(false);
-      onCircuitGenerated?.(false, "Failed to send circuit structure");
     }
   };
 
@@ -455,7 +459,7 @@ export default function STM32Connection({
 
             <button
               onClick={resetChip}
-              className={`ml-5 px-6 py-3 rounded-lg font-medium transition-colors bg-red-500 text-white-500`}
+              className={`ml-5 px-6 py-3 rounded-lg font-medium transition-colors bg-red-500 text-white`}
             >
               Reset Chip
             </button>
