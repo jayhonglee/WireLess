@@ -383,17 +383,11 @@ function ComponentSelection({
               onChange={(e) =>
                 setAddMode(e.target.value as "series" | "parallel")
               }
-              disabled={components.length === 0} // Disable for first component
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white disabled:opacity-50"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               <option value="series">Series</option>
               <option value="parallel">Parallel</option>
             </select>
-            {/* {components.length === 0 && (
-              <p className="absolute bottom-[-20px] left-[10px] text-xs text-gray-500 mt-1">
-                First component must be in series.
-              </p>
-            )} */}
           </div>
 
           <div className="flex items-end">
