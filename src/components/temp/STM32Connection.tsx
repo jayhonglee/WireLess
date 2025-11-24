@@ -79,6 +79,9 @@ export default function STM32Connection({
   }, [uart, onCircuitGenerated]);
 
   const connectToSTM32 = async () => {
+    // Disconnect existing connection first
+    if (uart) await disconnectFromSTM32();
+    
     setConnectionStatus("Connecting...");
     setGenerationStatus("connecting");
 
@@ -148,22 +151,25 @@ export default function STM32Connection({
     setReceivedData([]);
 
     try {
-      // Send reset signal
+      // Send reset signal first
       await uart.sendCircuitStructure("rnnnnnnn"); // Reset signal
       console.log("Reset signal sent to STM32F446RE");
 
-      // Mark as successful
-      setGenerationStatus("success");
-      setIsGenerating(false);
+      // Disconnect all ports after sending reset
+      await disconnectFromSTM32();
 
       // Reset circuit data and navigate to component selection
       if (handleResetCircuit) {
         handleResetCircuit();
       }
+      setGenerationStatus("success");
+      setIsGenerating(false);
     } catch (error) {
-      console.error("Error sending reset signal:", error);
+      console.error("Error resetting chip:", error);
       setGenerationStatus("error");
       setIsGenerating(false);
+      // Still disconnect on error
+      await disconnectFromSTM32();
     }
   };
 

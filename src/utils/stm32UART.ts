@@ -68,6 +68,17 @@ export class STM32UARTConnection {
 
   async connect(): Promise<boolean> {
     try {
+      // Disconnect current connection first
+      if (this.isConnected) await this.disconnect();
+      
+      // Close all previously granted ports
+      const ports = await navigator.serial.getPorts();
+      for (const port of ports) {
+        try {
+          await port.close();
+        } catch {}
+      }
+      
       // Request port access - shows port selection dialog
       this.port = await navigator.serial.requestPort();
       await this.port.open({
@@ -82,7 +93,16 @@ export class STM32UARTConnection {
       this.startReading();
       console.log('STM32F446RE connected successfully');
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message?.includes('already open')) {
+        // Port is already open, try to close all ports and retry
+        const ports = await navigator.serial.getPorts();
+        for (const port of ports) {
+          try { await port.close(); } catch {}
+        }
+        await new Promise(r => setTimeout(r, 300));
+        return this.connect();
+      }
       console.error('Failed to connect to STM32F446RE:', error);
       this.onErrorCallback?.(`Connection failed: ${error}`);
       return false;
@@ -92,12 +112,18 @@ export class STM32UARTConnection {
   async disconnect(): Promise<void> {
     try {
       this.isConnected = false;
-      await this.reader?.cancel();
-      await this.writer?.close();
-      await this.port?.close();
-      this.port = null;
-      this.reader = null;
-      this.writer = null;
+      if (this.reader) {
+        try { await this.reader.cancel(); } catch {}
+        this.reader = null;
+      }
+      if (this.writer) {
+        try { await this.writer.close(); } catch {}
+        this.writer = null;
+      }
+      if (this.port) {
+        try { await this.port.close(); } catch {}
+        this.port = null;
+      }
       console.log('STM32F446RE disconnected');
     } catch (error) {
       console.error('Error disconnecting STM32F446RE:', error);
@@ -109,7 +135,7 @@ export class STM32UARTConnection {
 
     try {
       const textDecoder = new TextDecoderStream();
-      this.port.readable?.pipeTo(textDecoder.writable);
+      this.port.readable?.pipeTo(textDecoder.writable as WritableStream<Uint8Array>);
       this.reader = textDecoder.readable?.getReader();
 
       if (!this.reader) return;
