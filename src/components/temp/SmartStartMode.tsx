@@ -203,6 +203,36 @@ function PowerSourceSelection({ onNext }: { onNext: () => void }) {
 }
 
 // Component Selection Component
+// Calculate socket count from components
+function calculateSocketCount(components: CircuitData["components"]): number {
+  if (components.length === 0) return 0;
+  
+  let socketCount = 0;
+  let i = 0;
+  
+  while (i < components.length) {
+    const mode = components[i]?.mode;
+    let count = 1;
+    
+    // Count consecutive components with the same mode
+    while (i + count < components.length && components[i + count]?.mode === mode) {
+      count++;
+    }
+    
+    if (mode === "series") {
+      // Series: 1 component = 1 socket
+      socketCount += count;
+    } else {
+      // Parallel: up to 4 components = 1 socket
+      socketCount += Math.ceil(count / 4);
+    }
+    
+    i += count;
+  }
+  
+  return socketCount;
+}
+
 function ComponentSelection({
   components,
   onUpdate,
@@ -222,6 +252,9 @@ function ComponentSelection({
     type: string;
     image: string;
   } | null>(null);
+  
+  const socketCount = calculateSocketCount(components);
+  const exceedsLimit = socketCount > 7;
 
   const COMPONENT_OPTIONS = [
     {
@@ -461,24 +494,51 @@ function ComponentSelection({
         </div>
       )}
 
-      <div className="flex justify-between">
+      {/* Socket Limit Warning */}
+      {exceedsLimit && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <div className="flex items-center space-x-2">
+            <svg
+              className="w-5 h-5 text-red-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span className="text-red-800 dark:text-red-200 font-medium">
+              Circuit exceeds 7 socket limit ({socketCount} sockets used). Please remove some components.
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-between items-center">
         <button
           onClick={onPrevious}
           className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
           Previous
         </button>
-        <button
-          onClick={onNext}
-          disabled={components.length === 0}
-          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-            components.length > 0
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-        >
-          Next Step
-        </button>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Sockets: {socketCount}/7
+          </span>
+          <button
+            onClick={onNext}
+            disabled={components.length === 0 || exceedsLimit}
+            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              components.length > 0 && !exceedsLimit
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            Next Step
+          </button>
+        </div>
       </div>
 
       {/* Component Insertion Modal */}
