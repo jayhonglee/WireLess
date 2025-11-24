@@ -408,7 +408,7 @@ export default function STM32Connection({
         </div>
 
         <div className="flex space-x-4">
-          {!isConnected ? (
+          {!isConnected && (
             <button
               onClick={connectToSTM32}
               disabled={generationStatus === "connecting"}
@@ -419,13 +419,6 @@ export default function STM32Connection({
               }`}
             >
               Connect to STM32F446RE
-            </button>
-          ) : (
-            <button
-              onClick={disconnectFromSTM32}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              Disconnect
             </button>
           )}
         </div>
